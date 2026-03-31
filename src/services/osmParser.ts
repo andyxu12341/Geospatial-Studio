@@ -87,20 +87,23 @@ function getCategoryName(tags: any, type: AreaQueryType): string {
     return levelMap[level] || `行政边界 (L${level})`;
   }
   if (type.startsWith("poi_") || type === "poi_all") {
-    // 优先返回更具体的标签，并进行简单的中文映射
-    const categoryKey = tags.amenity || tags.shop || tags.tourism || tags.leisure || tags.office || tags.craft;
-    if (!categoryKey) return "POI";
+    // 检查更多可能的标签
+    const categoryKey = tags.amenity || tags.shop || tags.tourism || tags.leisure || tags.office || tags.craft || tags.man_made || tags.historic || tags.sport;
+    if (!categoryKey) return "其他设施";
     
-    // 简单的中文映射，可以根据需要扩充
+    // 简单的中文映射
     const poiMap: Record<string, string> = {
-      "hospital": "医院", "clinic": "诊所", "pharmacy": "药店",
-      "school": "学校", "university": "大学",
-      "restaurant": "餐厅", "cafe": "咖啡馆",
-      "supermarket": "超市", "convenience": "便利店"
+      "hospital": "医院", "clinic": "诊所", "pharmacy": "药店", "doctors": "医生",
+      "school": "学校", "university": "大学", "kindergarten": "幼儿园", "library": "图书馆",
+      "restaurant": "餐厅", "cafe": "咖啡馆", "fast_food": "快餐", "bar": "酒吧",
+      "supermarket": "超市", "convenience": "便利店", "mall": "商场",
+      "bus_station": "公交站", "parking": "停车场", "fuel": "加油站",
+      "sports_centre": "体育中心", "pitch": "运动场", "stadium": "体育场",
+      "hotel": "酒店", "motel": "汽车旅馆"
     };
     return poiMap[categoryKey] || categoryKey;
   }
-  return "未知分类";
+  return "其他";
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

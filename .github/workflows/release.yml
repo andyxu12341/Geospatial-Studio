@@ -20,6 +20,9 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Force clean working directory
+        run: git reset --hard HEAD
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
 
