@@ -3,7 +3,7 @@
     "commitMessage": "chore: release v${version}",
     "requireCommits": true,
     "addUntrackedFiles": true,
-    "push": false,
+    "push": true,
     "tag": true,
     "tagName": "v${version}"
   },

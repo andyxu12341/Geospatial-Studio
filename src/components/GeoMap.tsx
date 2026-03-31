@@ -5,7 +5,7 @@ import "leaflet.chinatmsproviders";
 import "leaflet-draw";
 import "leaflet-draw/dist/leaflet.draw.css";
 import { wgs84togcj02, gcj02towgs84 } from "@/utils/coordTransform";
-import { LANDUSE_STANDARD_MAP } from "@/utils/geocoding";
+import { LANDUSE_STANDARD_MAP } from "@/services/constants";
 
 type DrawMode = "none" | "rectangle" | "polygon";
 
@@ -262,7 +262,6 @@ export const GeoMap = forwardRef<GeoMapHandle, GeoMapProps>(({ markers, classNam
     const gaodeLayer = (L.tileLayer as any).chinaProvider("GaoDe.Normal.Map", { attribution: GAODE_ATTR, maxZoom: 18 });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const gaodeSatLayer = (L.tileLayer as any).chinaProvider("GaoDe.Satellite.Map", { attribution: GAODE_ATTR, maxZoom: 18 });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const tdtLayer = (L.tileLayer as any).chinaProvider("TianDiTu.Normal.Map", { attribution: TIANDITU_ATTR, maxZoom: 18 });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

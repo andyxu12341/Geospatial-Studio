@@ -80,6 +80,9 @@ npm run release  # 发布新版本（SemVer） / Release new version
 ## 技术栈 | Tech Stack
 
 - **前端框架 / Frontend**: React 18 + TypeScript
+- **状态管理 / State Management**: TanStack Query (React Query) v5 — 内置缓存、自动重试、后台同步
+- **并行计算 / Parallel Computing**: Web Workers — 离线解析海量 GeoJSON 数据，确保 UI 线程不卡死
+- **架构模式 / Architecture**: 策略模式 (Strategy Pattern) — 抽象 AMap, Baidu, OSM 独立服务模块
 - **构建工具 / Build**: Vite
 - **UI 组件 / UI**: shadcn/ui (Radix UI)
 - **地图库 / Map**: Leaflet + leaflet-draw + leaflet.chinatmsproviders
@@ -88,7 +91,7 @@ npm run release  # 发布新版本（SemVer） / Release new version
 - **数据处理 / Data**: PapaParse, XLSX
 - **国际化 / i18n**: i18next + react-i18next
 - **动画 / Animation**: Framer Motion
-- **自动化发布 / Release**: release-it + conventional-changelog
+- **自动化发布 / Release**: release-it + conventional-changelog + GitHub Actions
 
 ---
 
@@ -96,26 +99,23 @@ npm run release  # 发布新版本（SemVer） / Release new version
 
 ```
 src/
-├── pages/
-│   └── Index.tsx              # 主页面 | Main page
-├── components/
-│   ├── GeoMap.tsx             # 地图组件（Leaflet 原生，含底图对齐）| Map component with basemap auto-alignment
-│   ├── GeocodingPanel.tsx     # Tab A 坐标转换面板 | Tab A geocoding panel
-│   ├── AreaQueryPanel.tsx     # Tab B 面域/POI 提取面板 | Tab B extraction panel
-│   ├── ResultsSection.tsx     # 统一结果表格 | Unified results table
-│   ├── HelpDialog.tsx         # 新手引导对话框 | Onboarding help dialog
-│   └── ui/                   # shadcn/ui 组件库
+├── services/                 # 核心服务层 | Core Service Layer
+│   ├── amap.ts               # 高德地图服务 | Gaode/AMap Service
+│   ├── baidu.ts              # 百度地图服务 | Baidu Service
+│   ├── osm.ts                # OSM/Overpass 服务 | OSM/Overpass Service
+│   ├── factory.ts            # 服务工厂 | Service Factory
+│   └── osmWorker.ts          # OSM 数据解析 Worker | OSM Data Parser Worker
 ├── hooks/
 │   ├── useGeocoding.ts        # 坐标转换 Hook | Geocoding hook
-│   └── useOverpassQuery.ts    # 面域/POI 查询 Hook | Overpass query hook
+│   └── useOverpassQuery.ts    # 空间查询 Hook (React Query 封装) | Spatial query hook
+├── components/
+│   ├── GeoMap.tsx             # 地图组件 | Map component
+│   ├── GeocodingPanel.tsx     # 坐标转换面板 | Geocoding panel
+│   ├── AreaQueryPanel.tsx     # 空间查询面板 | Spatial query panel
+│   └── ResultsSection.tsx     # 结果展示 | Results view
 ├── utils/
-│   ├── geocoding.ts          # 地理编码 + Overpass QL 查询 | Geocoding + Overpass QL
-│   ├── coordTransform.ts      # GCJ-02/BD-09 ⇄ WGS-84 坐标转换 | Coordinate transform
-│   └── exportUtils.ts        # 导出 CSV / GeoJSON / KML | Export utilities
-├── i18n/
-│   └── locales/              # 翻译文件 zh.json / en.json
-└── lib/
-    └── utils.ts              # 工具函数
+│   ├── geocoding.ts          # 统一接口导出 | Unified API exports
+│   └── coordTransform.ts      # 坐标转换工具 | Coordinate transform
 ```
 
 ---
@@ -128,11 +128,16 @@ src/
 
 ## 版本发布 | Release
 
-发布遵循 SemVer，每次 push 自动触发：
+项目遵循 [Conventional Commits](https://www.conventionalcommits.org/) 规范。
+
+每次 push 到 `main` 分支将自动触发 GitHub Actions：
+1. **自动化版本号更新** (SemVer)
+2. **自动生成 CHANGELOG.md**
+3. **自动创建 GitHub Release**
 
 ```bash
-npm run release   # 版本号+1 → CHANGELOG.md 更新 → GitHub Release 自动生成
-npm run release:dry  # 预览模式
+npm run release   # 手动触发发布流程
+npm run release:dry  # 预览发布效果
 ```
 
 ---
