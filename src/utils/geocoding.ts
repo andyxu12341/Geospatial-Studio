@@ -851,18 +851,18 @@ function getPOITypeFilter(type: AreaQueryType): string {
 function buildPOIBboxQuery(bbox: [number, number, number, number], poiType: AreaQueryType): string {
   const [south, west, north, east] = bbox;
   const filter = getPOITypeFilter(poiType);
-  return `[out:json][timeout:300];(${filter.replace(/AREA_PLACEHOLDER/g, `${south},${west},${north},${east}`)});out body;`;
+  return `[out:json][timeout:25];(${filter.replace(/AREA_PLACEHOLDER/g, `${south},${west},${north},${east}`)});out body 1000;`;
 }
 
 function buildPOIPolygonQuery(latlngs: [number, number][], poiType: AreaQueryType): string {
   const polyStr = latlngs.map(([lat, lng]) => `${lat} ${lng}`).join(" ");
   const filter = getPOITypeFilter(poiType);
-  return `[out:json][timeout:300];(${filter.replace(/AREA_PLACEHOLDER/g, `poly:"${polyStr}"`)});out body;`;
+  return `[out:json][timeout:25];(${filter.replace(/AREA_PLACEHOLDER/g, `poly:"${polyStr}"`)});out body 1000;`;
 }
 
 function buildPOIAreaQuery(areaId: string, poiType: AreaQueryType): string {
   const filter = getPOITypeFilter(poiType);
-  return `[out:json][timeout:300];(${filter.replace(/AREA_PLACEHOLDER/g, `area(${areaId})`)});out body;`;
+  return `[out:json][timeout:25];(${filter.replace(/AREA_PLACEHOLDER/g, `area(${areaId})`)});out body 1000;`;
 }
 
 function buildBboxOverpassQuery(bbox: [number, number, number, number], type: AreaQueryType): string {
@@ -870,7 +870,7 @@ function buildBboxOverpassQuery(bbox: [number, number, number, number], type: Ar
   // Overpass bbox format: (south,west,north,east)
   const bboxStr = `${south},${west},${north},${east}`;
   const filter = getAreaTypeFilter(type, bboxStr);
-  return `[out:json][timeout:900];(${filter});out geom;`;
+  return `[out:json][timeout:30];(${filter});out geom 500;`;
 }
 
 function buildPolygonOverpassQuery(latlngs: [number, number][], type: AreaQueryType): string {
@@ -878,7 +878,7 @@ function buildPolygonOverpassQuery(latlngs: [number, number][], type: AreaQueryT
   const polyStr = latlngs.map(([lat, lng]) => `${lat} ${lng}`).join(" ");
   const polyRef = `poly:"${polyStr}"`;
   const filter = getAreaTypeFilter(type, polyRef);
-  return `[out:json][timeout:900];(${filter});out geom;`;
+  return `[out:json][timeout:30];(${filter});out geom 500;`;
 }
 
 // getAreaPolyFilter removed — unified into getAreaTypeFilter with areaRef param
@@ -1035,6 +1035,7 @@ async function runOverpassQuery(query: string, signal?: AbortSignal): Promise<Ov
         mode: "cors",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
+          "User-Agent": "Geospatial-Studio/1.0 (https://github.com/andyxu12341/Geospatial-Studio)",
         },
         body: `data=${encodeURIComponent(query)}`,
         signal: signal || AbortSignal.timeout(60000),
