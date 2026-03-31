@@ -1,5 +1,12 @@
 
 
+## [1.2.5](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.2.4...v1.2.5) (2026-03-31)
+
+
+### Bug Fixes
+
+* 移除 StrictMode 并修复 sonner 依赖问题 ([632454a](https://github.com/andyxu12341/Geospatial-Studio/commit/632454a50c9a8f0212ba0026862f06b8cf084e1c))
+
 ## [1.2.4](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.2.3...v1.2.4) (2026-03-31)
 
 
