@@ -4,10 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => ({
-  // Vercel: use "/" | GitHub Pages: use "/Geospatial-Studio/"
-  base: command === "build" && process.env.VITE_DEPLOY_TARGET === "github"
-    ? "/Geospatial-Studio/"
-    : "/",
+  base: '/Geospatial-Studio/',
   server: {
     host: "::",
     port: 3000,
