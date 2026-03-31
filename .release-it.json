@@ -16,8 +16,6 @@
     }
   },
   "hooks": {
-    "before:init": [
-      "sed -i 's/version-v[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+/version-v${version}/g' README.md"
-    ]
+    "after:bump": "node -e 'const fs = require(\"fs\"); const pkg = JSON.parse(fs.readFileSync(\"package.json\", \"utf8\")); fs.writeFileSync(\"README.md\", fs.readFileSync(\"README.md\", \"utf8\").replace(/version-v[0-9]+\\.[0-9]+\\.[0-9]+/g, \"version-v\" + pkg.version))'"
   }
 }

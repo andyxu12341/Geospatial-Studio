@@ -31,10 +31,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit changes
+      - name: Commit lockfile
         run: |
-          git add .
-          git commit -m "chore: prepare for release" || echo "No changes to commit"
+          git add package-lock.json
+          git commit -m "chore: update lockfile" || echo "No changes to commit"
 
       - name: Pull latest changes
         run: git pull origin main --rebase
