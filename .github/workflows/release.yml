@@ -36,6 +36,9 @@ jobs:
           git add .
           git commit -m "chore: prepare for release" || echo "No changes to commit"
 
+      - name: Pull latest changes
+        run: git pull origin main --rebase
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
