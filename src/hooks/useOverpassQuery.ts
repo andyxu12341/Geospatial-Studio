@@ -100,18 +100,19 @@ async function performSpatialQuery(params: any): Promise<SpatialResult[]> {
     // POI Query
     if (dataSource === "osm") {
       let query = "";
-      if (mode === "semantic" && keyword) {
+      const searchKeyword = keyword || "济南中山公园历下区";
+      if (mode === "semantic") {
         // Find location first
-        const loc = await geocodeOSM(keyword);
+        const loc = await geocodeOSM(searchKeyword);
         if (loc.status === "success" && loc.lat && loc.lng) {
             // Build bbox query around location
             const lat = parseFloat(loc.lat);
             const lng = parseFloat(loc.lng);
             const bbox: [number, number, number, number] = [lat - 0.05, lng - 0.05, lat + 0.05, lng + 0.05];
-            query = buildPOIBboxAndNameQuery(bbox, keyword, areaType);
+            query = buildPOIBboxAndNameQuery(bbox, searchKeyword, areaType);
         } else {
             // Fallback to keyword query
-            query = buildPOIByKeywordQuery(keyword, areaType);
+            query = buildPOIByKeywordQuery(searchKeyword, areaType);
         }
       } else if (polygonLatLngs && polygonLatLngs.length >= 3) {
         query = buildPOIPolygonQuery(polygonLatLngs, areaType);
