@@ -1,11 +1,23 @@
 {
   "git": {
-    "commitMessage": "chore: release v${version}"
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}"
   },
   "github": {
     "release": false
   },
   "npm": {
     "publish": true
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "infile": "CHANGELOG.md",
+      "header": "# Changelog"
+    }
+  },
+  "hooks": {
+    "before:init": [
+      "sed -i 's/version-v[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+/version-v${version}/g' README.md"
+    ]
   }
 }
