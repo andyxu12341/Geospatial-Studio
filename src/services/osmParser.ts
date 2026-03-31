@@ -87,7 +87,18 @@ function getCategoryName(tags: any, type: AreaQueryType): string {
     return levelMap[level] || `行政边界 (L${level})`;
   }
   if (type.startsWith("poi_") || type === "poi_all") {
-    return tags.amenity || tags.shop || tags.tourism || tags.leisure || tags.office || tags.craft || "POI";
+    // 优先返回更具体的标签，并进行简单的中文映射
+    const categoryKey = tags.amenity || tags.shop || tags.tourism || tags.leisure || tags.office || tags.craft;
+    if (!categoryKey) return "POI";
+    
+    // 简单的中文映射，可以根据需要扩充
+    const poiMap: Record<string, string> = {
+      "hospital": "医院", "clinic": "诊所", "pharmacy": "药店",
+      "school": "学校", "university": "大学",
+      "restaurant": "餐厅", "cafe": "咖啡馆",
+      "supermarket": "超市", "convenience": "便利店"
+    };
+    return poiMap[categoryKey] || categoryKey;
   }
   return "未知分类";
 }
