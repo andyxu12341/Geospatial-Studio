@@ -1,3 +1,4 @@
+import osmtogeojson from 'osmtogeojson';
 import { AreaQueryType, AreaResult, POIResult } from "./types";
 import { LANDUSE_STANDARD_MAP, POI_COLORS, BUILDING_NAME_MAP } from "./constants";
 
@@ -5,77 +6,61 @@ import { LANDUSE_STANDARD_MAP, POI_COLORS, BUILDING_NAME_MAP } from "./constants
 export function parseOverpassElements(data: any, queryType: AreaQueryType): (AreaResult | POIResult)[] {
   if (!data || !data.elements) return [];
 
-  const nodes = new Map<number, [number, number]>();
-  const ways = new Map<number, number[]>();
-  const elements = data.elements;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  elements.forEach((el: any) => {
-    if (el.type === "node") nodes.set(el.id, [el.lon, el.lat]);
-    if (el.type === "way") ways.set(el.id, el.nodes);
-  });
-
+  const geojson = osmtogeojson(data);
   const results: (AreaResult | POIResult)[] = [];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  elements.forEach((el: any) => {
-    if (!el.tags) return;
+  geojson.features.forEach((feature: any) => {
+    const tags = feature.properties.tags || {};
+    const geometry = feature.geometry;
+    if (!geometry) return;
 
     if (queryType.startsWith("poi_") || queryType === "poi_all") {
-      let lat = el.lat;
-      let lng = el.lon;
-      if (el.type === "way" && el.center) {
-        lat = el.center.lat;
-        lng = el.center.lon;
-      } else if (el.type === "way" && !el.center && el.nodes) {
-        const coords = el.nodes.map((id: number) => nodes.get(id)).filter(Boolean);
-        if (coords.length > 0) {
-          lat = coords.reduce((acc: number, c) => acc + c[1], 0) / coords.length;
-          lng = coords.reduce((acc: number, c) => acc + c[0], 0) / coords.length;
-        }
+      let lat: number | undefined;
+      let lng: number | undefined;
+
+      if (geometry.type === "Point") {
+        [lng, lat] = geometry.coordinates;
+      } else if (geometry.type === "Polygon" || geometry.type === "LineString") {
+        // Use centroid for non-point features
+        const coords = geometry.type === "Polygon" ? geometry.coordinates[0] : geometry.coordinates;
+        lat = coords.reduce((acc: number, c: number[]) => acc + c[1], 0) / coords.length;
+        lng = coords.reduce((acc: number, c: number[]) => acc + c[0], 0) / coords.length;
       }
 
       if (lat !== undefined && lng !== undefined) {
         results.push({
-          name: el.tags.name || el.tags["name:zh"] || el.tags["name:en"] || "未命名点位",
+          name: tags.name || tags["name:zh"] || tags["name:en"] || "未命名点位",
           type: queryType,
-          osmId: el.id,
-          osmType: el.type,
+          osmId: feature.properties.id,
+          osmType: feature.properties.type,
           lat,
           lng,
-          categoryName: getCategoryName(el.tags, queryType),
+          categoryName: getCategoryName(tags, queryType),
           color: POI_COLORS[queryType] || "#9B59B6",
-          tags: el.tags,
+          tags: tags,
           source: "osm"
         } as POIResult);
       }
     } else {
       let coords: [number, number][] = [];
-      if (el.type === "way") {
-        coords = el.nodes.map((id: number) => nodes.get(id)).filter(Boolean);
-      } else if (el.type === "relation" && el.members) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        el.members.forEach((m: any) => {
-          if (m.type === "way" && m.role !== "inner") {
-            const wayNodes = ways.get(m.ref);
-            if (wayNodes) {
-              coords.push(...wayNodes.map(id => nodes.get(id)).filter(Boolean));
-            }
-          }
-        });
+      if (geometry.type === "Polygon") {
+        coords = geometry.coordinates[0].map((c: number[]) => [c[0], c[1]]);
+      } else if (geometry.type === "MultiPolygon") {
+        // Simple approach: take the first polygon
+        coords = geometry.coordinates[0][0].map((c: number[]) => [c[0], c[1]]);
       }
 
       if (coords.length >= 3) {
         results.push({
-          name: el.tags.name || el.tags["name:zh"] || el.tags["name:en"] || "未命名区域",
+          name: tags.name || tags["name:zh"] || tags["name:en"] || "未命名区域",
           type: queryType,
-          osmId: el.id,
-          osmType: el.type,
-          tags: el.tags,
-          categoryName: getCategoryName(el.tags, queryType),
-          color: getCategoryColor(el.tags, queryType),
-          polygon: [coords],
-          center: el.center ? { lat: el.center.lat, lng: el.center.lon } : undefined
+          osmId: feature.properties.id,
+          osmType: feature.properties.type,
+          tags: tags,
+          categoryName: getCategoryName(tags, queryType),
+          color: getCategoryColor(tags, queryType),
+          polygon: [coords.map(c => [c[0], c[1]])],
+          center: geometry.type === "Polygon" ? { lat: geometry.coordinates[0][0][1], lng: geometry.coordinates[0][0][0] } : undefined
         } as AreaResult);
       }
     }
