@@ -1,5 +1,12 @@
 
 
+## [1.2.2](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.2.1...v1.2.2) (2026-03-31)
+
+
+### Bug Fixes
+
+* 修复 App.tsx 路由指向原始 Index 页面，保留 Vite 部署路径修复 ([3ad108d](https://github.com/andyxu12341/Geospatial-Studio/commit/3ad108dde11c7f5042e1b41f6e8853384b72d19b))
+
 ## [1.2.1](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.2.0...v1.2.1) (2026-03-31)
 
 
