@@ -164,9 +164,10 @@ export function buildPOIBboxAndNameQuery(bbox: [number, number, number, number],
   const [s, w, n, e] = bbox;
   const bboxStr = `${s},${w},${n},${e}`;
   const filters = getPOITypeFilter(type);
+  // 使用正则表达式进行模糊匹配，并确保语法正确
   return `[out:json][timeout:60];
 (
-  ${filters.map(f => `node${f}(${bboxStr})["name"~"${name}","name:zh"~"${name}"];way${f}(${bboxStr})["name"~"${name}","name:zh"~"${name}"];`).join("\n  ")}
+  ${filters.map(f => `node${f}(${bboxStr})["name"~"${name}",i];way${f}(${bboxStr})["name"~"${name}",i];`).join("\n  ")}
 );
 out center;`;
 }
