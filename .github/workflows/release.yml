@@ -31,6 +31,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -m "chore: prepare for release" || echo "No changes to commit"
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

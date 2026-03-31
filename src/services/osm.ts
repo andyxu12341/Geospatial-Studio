@@ -166,7 +166,7 @@ export function buildPOIBboxAndNameQuery(bbox: [number, number, number, number],
   const filters = getPOITypeFilter(type);
   return `[out:json][timeout:60];
 (
-  ${filters.map(f => `node${f}["name"~"${name}","name:zh"~"${name}"](${bboxStr});way${f}["name"~"${name}","name:zh"~"${name}"](${bboxStr});`).join("\n  ")}
+  ${filters.map(f => `node${f}(${bboxStr})["name"~"${name}","name:zh"~"${name}"];way${f}(${bboxStr})["name"~"${name}","name:zh"~"${name}"];`).join("\n  ")}
 );
 out center;`;
 }
