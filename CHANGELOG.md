@@ -1,3 +1,18 @@
+
+
+* chore: prepare for release (98e42d8)
+* feat: Introduce Zustand for state management (f626cf7)
+* chore: release v1.1.0 (59add75)
+* chore: prepare for release (e311b45)
+* fix: Revert to version 1.0.2 and remove unused dependencies (a942de1)
+* chore: release v1.1.0 (b6a6339)
+* chore: prepare for release (4da4364)
+* fix: Update project version and dependencies (9e41b30)
+* chore: release v1.1.0 (a668e81)
+* chore: prepare for release (c0d6954)
+* feat(useOverpassQuery): Improve semantic search fallback (7838f1f)
+* fix: Simplify OSM POI query and parsing (a0af30a)
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
