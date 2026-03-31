@@ -1,5 +1,12 @@
 
 
+## [1.2.3](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.2.2...v1.2.3) (2026-03-31)
+
+
+### Bug Fixes
+
+* 移除多余的 ThemeProvider 避免与 Index 内部 dark mode 冲突 ([d9ef3e9](https://github.com/andyxu12341/Geospatial-Studio/commit/d9ef3e9b04f1e14b0339c334e8c8d517c26aed95))
+
 ## [1.2.2](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.2.1...v1.2.2) (2026-03-31)
 
 
