@@ -9,7 +9,7 @@ export function parseOverpassElements(data: any, queryType: AreaQueryType): (Are
   const geojson = osmtogeojson(data);
   const results: (AreaResult | POIResult)[] = [];
 
-  geojson.features.forEach((feature: any) => {
+  geojson.features.forEach((feature: GeoJSON.Feature) => {
     const tags = feature.properties.tags || {};
     const geometry = feature.geometry;
     if (!geometry) return;

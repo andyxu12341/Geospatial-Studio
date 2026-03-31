@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Search, Square, Pentagon, Loader2 } from "lucide-react";
@@ -11,11 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useOverpassQuery, type SpatialResult } from "@/hooks/useOverpassQuery";
 import {
   type AreaQueryType,
-  type AreaQueryMode,
   AREA_TYPE_LABELS,
   type MapSource,
 } from "@/utils/geocoding";
 import type { GeoMapHandle } from "@/components/GeoMap";
+import { useSpatialQueryStore, type QueryMode } from "@/store/useSpatialQueryStore";
 
 interface AreaQueryPanelProps {
   geoMapRef: React.RefObject<GeoMapHandle>;
@@ -62,49 +62,51 @@ function TypeButton({
 export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onResults }: AreaQueryPanelProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { fetchSpatial, isLoading, error } = useOverpassQuery();
-
-  const [mode, setMode] = useState<AreaQueryMode>("semantic");
-  const [keyword, setKeyword] = useState("");
-  const [areaType, setAreaType] = useState<AreaQueryType>("building");
+  const { fetchSpatial, error } = useOverpassQuery();
+  
+  const {
+    dataSource, setDataSource,
+    queryMode, setQueryMode,
+    areaType, setAreaType,
+    keyword, setKeyword,
+    isLoading, setIsLoading,
+    setResults
+  } = useSpatialQueryStore();
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isOsm = mapSource === "osm";
+  const isValidQuery = () => {
+    if (queryMode === "semantic" && !keyword.trim()) return false;
+    if (!isOsm && !areaType.startsWith("poi_")) return false;
+    return true;
+  };
 
-  useEffect(() => {
-    if (!isOsm && !areaType.startsWith("poi_")) {
-      setAreaType("poi_all");
-    }
-  }, [isOsm, areaType, mapSource]);
-
-  useEffect(() => {
-    if (error) {
-      console.error("!!! [AreaQuery ERROR]", error);
-      toast({ title: t("toast.areaError"), description: error, variant: "destructive" });
-    }
-  }, [error, toast, t]);
-
-  const poiSource = isOsm ? "osm" : mapSource === "gaode" ? "gaode" : "baidu";
+  const poiSource = dataSource;
   const apiKey = poiSource === "gaode" ? gaodeKey.trim() : poiSource === "baidu" ? baiduKey.trim() : undefined;
   const effectiveAreaType = (!isOsm && !areaType.startsWith("poi_")) ? "poi_all" : areaType;
 
   const handleQuery = async () => {
+    if (!isValidQuery()) {
+      toast({ title: t("toast.invalidQuery"), variant: "destructive" });
+      return;
+    }
     try {
       if (debounceRef.current) { return; }
       debounceRef.current = setTimeout(() => { debounceRef.current = null; }, 800);
 
-      // 问题二：在查询前清空旧结果，确保地图和列表更新
+      setIsLoading(true);
       onResults([]); 
+      setResults([]);
 
-      // 问题四：如果为空，使用 placeholder 作为关键词
       const finalKeyword = keyword.trim() || t("areaQuery.keywordPlaceholder");
 
-      if (mode === "semantic" && !finalKeyword) {
+      if (queryMode === "semantic" && !finalKeyword) {
         toast({ title: t("toast.noKeyword"), variant: "destructive" });
+        setIsLoading(false);
         return;
       }
 
-      if (mode === "rectangle") {
+      if (queryMode === "rectangle") {
         geoMapRef.current?.setDrawCallbacks(async (bounds) => {
           const bbox: [number, number, number, number] = [
             bounds.getSouth(), bounds.getWest(),
@@ -112,17 +114,21 @@ export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onRes
           ];
           const results = await fetchSpatial({ mode: "rectangle", areaType: effectiveAreaType, dataSource: poiSource, bbox, apiKey });
           onResults(results);
+          setResults(results);
+          setIsLoading(false);
           geoMapRef.current?.setDrawMode("none");
         }, null);
         geoMapRef.current?.setDrawMode("rectangle");
         return;
       }
 
-      if (mode === "polygon") {
+      if (queryMode === "polygon") {
         geoMapRef.current?.setDrawCallbacks(null, async (latlngs) => {
           const polygonLatLngs: [number, number][] = latlngs.map(l => [l.lat, l.lng]);
           const results = await fetchSpatial({ mode: "polygon", areaType: effectiveAreaType, dataSource: poiSource, polygonLatLngs, apiKey });
           onResults(results);
+          setResults(results);
+          setIsLoading(false);
           geoMapRef.current?.setDrawMode("none");
         });
         geoMapRef.current?.setDrawMode("polygon");
@@ -131,7 +137,10 @@ export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onRes
 
       const results = await fetchSpatial({ mode: "semantic", areaType: effectiveAreaType, dataSource: poiSource, keyword: finalKeyword, apiKey });
       onResults(results);
+      setResults(results);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       const msg = err instanceof Error ? err.message : String(err);
       toast({ title: "系统错误", description: msg, variant: "destructive" });
     }
@@ -188,12 +197,16 @@ export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onRes
           <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
             {t("areaQuery.extractionMode")}
           </label>
-          <RadioGroup value={mode} onValueChange={v => setMode(v as AreaQueryMode)} className="space-y-2">
-            {(["semantic", "rectangle", "polygon"] as AreaQueryMode[]).map(m => {
+          <RadioGroup value={queryMode} onValueChange={v => setQueryMode(v as QueryMode)} className="space-y-2">
+            {(["semantic", "rectangle", "polygon"] as QueryMode[]).map(m => {
               const icons = { semantic: Search, rectangle: Square, polygon: Pentagon };
               const Icon = icons[m];
+              
               return (
-                <div key={m} className="flex items-start gap-2.5 rounded-lg border p-2.5 hover:bg-accent/40 transition-colors">
+                <div 
+                  key={m} 
+                  className="flex items-start gap-2.5 rounded-lg border p-2.5 hover:bg-accent/40 transition-colors cursor-pointer"
+                >
                   <RadioGroupItem value={m} id={m} className="mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <Label htmlFor={m} className="flex items-center gap-1.5 text-sm font-medium cursor-pointer">
@@ -209,7 +222,7 @@ export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onRes
         </div>
 
         <AnimatePresence mode="wait">
-          {mode === "semantic" && (
+          {queryMode === "semantic" && (
             <motion.div
               key="semantic"
               initial={{ opacity: 0, height: 0 }}
@@ -229,7 +242,7 @@ export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onRes
             </motion.div>
           )}
 
-          {mode === "rectangle" && (
+          {queryMode === "rectangle" && (
             <motion.div
               key="rect"
               initial={{ opacity: 0, height: 0 }}
@@ -242,7 +255,7 @@ export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onRes
             </motion.div>
           )}
 
-          {mode === "polygon" && (
+          {queryMode === "polygon" && (
             <motion.div
               key="poly"
               initial={{ opacity: 0, height: 0 }}
@@ -259,9 +272,9 @@ export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onRes
         <Button onClick={handleQuery} disabled={isLoading} className="w-full gap-1.5">
           {isLoading ? (
             <><Loader2 className="h-4 w-4 animate-spin" /> {t("toast.areaQuery")}...</>
-          ) : mode === "rectangle" ? (
+          ) : queryMode === "rectangle" ? (
             <><Square className="h-4 w-4" /> {t("areaQuery.startDrawRect")}</>
-          ) : mode === "polygon" ? (
+          ) : queryMode === "polygon" ? (
             <><Pentagon className="h-4 w-4" /> {t("areaQuery.startDrawPoly")}</>
           ) : (
             <><Search className="h-4 w-4" /> {t("areaQuery.query")}</>
