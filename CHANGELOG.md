@@ -1,3 +1,9 @@
+
+
+* chore: prepare for release (c0d6954)
+* feat(useOverpassQuery): Improve semantic search fallback (7838f1f)
+* fix: Simplify OSM POI query and parsing (a0af30a)
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
