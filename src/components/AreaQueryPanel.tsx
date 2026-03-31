@@ -93,7 +93,13 @@ export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onRes
       if (debounceRef.current) { return; }
       debounceRef.current = setTimeout(() => { debounceRef.current = null; }, 800);
 
-      if (mode === "semantic" && !keyword.trim()) {
+      // 问题二：在查询前清空旧结果，确保地图和列表更新
+      onResults([]); 
+
+      // 问题四：如果为空，使用 placeholder 作为关键词
+      const finalKeyword = keyword.trim() || t("areaQuery.keywordPlaceholder");
+
+      if (mode === "semantic" && !finalKeyword) {
         toast({ title: t("toast.noKeyword"), variant: "destructive" });
         return;
       }
@@ -123,7 +129,7 @@ export function AreaQueryPanel({ geoMapRef, mapSource, gaodeKey, baiduKey, onRes
         return;
       }
 
-      const results = await fetchSpatial({ mode: "semantic", areaType: effectiveAreaType, dataSource: poiSource, keyword: keyword.trim(), apiKey });
+      const results = await fetchSpatial({ mode: "semantic", areaType: effectiveAreaType, dataSource: poiSource, keyword: finalKeyword, apiKey });
       onResults(results);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

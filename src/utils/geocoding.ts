@@ -18,8 +18,10 @@ export {
   buildPOIBboxQuery, 
   buildPOIPolygonQuery, 
   buildPOIByKeywordQuery,
+  buildPOIBboxAndNameQuery,
   parseOverpassElements,
-  getQueryGroup
+  getQueryGroup,
+  geocodeOSM
 } from "../services/osm";
 
 // Re-export MapSource for backward compatibility

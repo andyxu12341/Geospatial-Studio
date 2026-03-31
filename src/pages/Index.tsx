@@ -397,8 +397,8 @@ export default function Index() {
                     <Map className="h-4 w-4" /> {t("map.title")}
                   </CardTitle>
                   <span className="text-xs text-muted-foreground">
-                    {mapMarkers.length > 0 || mapPolygons.length > 0
-                      ? `${mapMarkers.length > 0 ? t("map.markers", { count: mapMarkers.length }) : ""}${mapMarkers.length > 0 && mapPolygons.length > 0 ? " · " : ""}${mapPolygons.length > 0 ? t("map.polygons", { count: mapPolygons.length }) : ""}`
+                    {allMapMarkers.length > 0 || mapPolygons.length > 0
+                      ? `${allMapMarkers.length > 0 ? t("map.markers", { count: allMapMarkers.length }) : ""}${allMapMarkers.length > 0 && mapPolygons.length > 0 ? " · " : ""}${mapPolygons.length > 0 ? t("map.polygons", { count: mapPolygons.length }) : ""}`
                       : t("map.waiting")}
                   </span>
                 </div>

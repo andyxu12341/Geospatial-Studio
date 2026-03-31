@@ -9,7 +9,10 @@ import {
   buildPOIBboxQuery,
   buildPOIPolygonQuery,
   buildPOIByKeywordQuery,
+  buildPOIBboxAndNameQuery,
   parseOverpassElements,
+  getQueryGroup,
+  geocodeOSM,
   type AreaQueryType,
   type AreaQueryMode,
   type AreaResult,
@@ -98,7 +101,18 @@ async function performSpatialQuery(params: any): Promise<SpatialResult[]> {
     if (dataSource === "osm") {
       let query = "";
       if (mode === "semantic" && keyword) {
-        query = buildPOIByKeywordQuery(keyword, areaType);
+        // Find location first
+        const loc = await geocodeOSM(keyword);
+        if (loc.status === "success" && loc.lat && loc.lng) {
+            // Build bbox query around location
+            const lat = parseFloat(loc.lat);
+            const lng = parseFloat(loc.lng);
+            const bbox: [number, number, number, number] = [lat - 0.05, lng - 0.05, lat + 0.05, lng + 0.05];
+            query = buildPOIBboxAndNameQuery(bbox, keyword, areaType);
+        } else {
+            // Fallback to keyword query
+            query = buildPOIByKeywordQuery(keyword, areaType);
+        }
       } else if (polygonLatLngs && polygonLatLngs.length >= 3) {
         query = buildPOIPolygonQuery(polygonLatLngs, areaType);
       } else if (bbox) {

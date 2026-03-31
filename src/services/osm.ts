@@ -18,6 +18,7 @@ export async function geocodeOSM(address: string, city?: string): Promise<Geocod
     url.searchParams.set("format", "json");
     url.searchParams.set("limit", "5");
     url.searchParams.set("addressdetails", "1");
+    url.searchParams.set("countrycodes", "cn");
     if (city) url.searchParams.set("city", city);
 
     const res = await withRetry(() => fetch(url.toString(), {
@@ -159,24 +160,28 @@ export function buildPOIPolygonQuery(latLngs: [number, number][], type: AreaQuer
 out center;`;
 }
 
-export function buildPOIByKeywordQuery(keyword: string, type: AreaQueryType): string {
+export function buildPOIBboxAndNameQuery(bbox: [number, number, number, number], name: string, type: AreaQueryType): string {
+  const [s, w, n, e] = bbox;
+  const bboxStr = `${s},${w},${n},${e}`;
   const filters = getPOITypeFilter(type);
-  if (type === "poi_all") {
-    return `[out:json][timeout:60];
+  return `[out:json][timeout:60];
 (
-  node["name"~"${keyword}"];
-  way["name"~"${keyword}"];
-  rel["name"~"${keyword}"];
+  ${filters.map(f => `node${f}["name"~"${name}","name:zh"~"${name}"](${bboxStr});way${f}["name"~"${name}","name:zh"~"${name}"](${bboxStr});`).join("\n  ")}
 );
 out center;`;
-  } else {
-    return `[out:json][timeout:60];
+}
+
+export function buildPOIByKeywordQuery(keyword: string, type: AreaQueryType): string {
+  const filters = getPOITypeFilter(type);
+  
+  // 1. First, try to find an area matching the keyword
+  // 2. Then, search within that area using the filters
+  return `[out:json][timeout:60];
 area["name"~"${keyword}"]->.searchArea;
 (
   ${filters.map(f => `node${f}(area.searchArea);way${f}(area.searchArea);`).join("\n  ")}
 );
 out center;`;
-  }
 }
 
 function getAreaTypeFilter(type: AreaQueryType): string[] {
