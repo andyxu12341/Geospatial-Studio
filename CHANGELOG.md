@@ -1,3 +1,17 @@
+
+
+# [1.1.0](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.0.2...v1.1.0) (2026-03-31)
+
+
+### Bug Fixes
+
+* Update README version automatically ([e0b25a0](https://github.com/andyxu12341/Geospatial-Studio/commit/e0b25a037e7e7a53009fd47238219eba672300bd))
+
+
+### Features
+
+* **release-it:** Configure conventional changelog preset ([9a71e16](https://github.com/andyxu12341/Geospatial-Studio/commit/9a71e16c49b22cb8618cfaf78032a8159a5e8d5a))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
