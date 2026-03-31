@@ -6,7 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Stars](https://img.shields.io/github/stars/andyxu12341/Geocoding-China-Pro)](https://github.com/andyxu12341/Geocoding-China-Pro/stargazers)
-[![version](https://img.shields.io/badge/version-v1.0.1-blue)](https://github.com/andyxu12341/Geocoding-China-Pro/releases)
+[![version](https://img.shields.io/badge/version-v1.1.0-blue)](https://github.com/andyxu12341/Geocoding-China-Pro/releases)
 
 ---
 
