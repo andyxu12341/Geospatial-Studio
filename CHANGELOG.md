@@ -1,5 +1,12 @@
 
 
+## [1.2.1](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.2.0...v1.2.1) (2026-03-31)
+
+
+### Bug Fixes
+
+* 按照新架构重写 App.tsx 并修正 Vite 部署基准路径 ([dd5993d](https://github.com/andyxu12341/Geospatial-Studio/commit/dd5993d2cbc72579b2eef829615559956b351caf))
+
 # [1.2.0](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.1.0...v1.2.0) (2026-03-31)
 
 
