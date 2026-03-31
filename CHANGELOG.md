@@ -1,5 +1,12 @@
 
 
+## [1.2.4](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.2.3...v1.2.4) (2026-03-31)
+
+
+### Bug Fixes
+
+* 修复 i18n 未初始化问题 ([75115b0](https://github.com/andyxu12341/Geospatial-Studio/commit/75115b0a762ffd8f658d14473f3fc250c163100c))
+
 ## [1.2.3](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.2.2...v1.2.3) (2026-03-31)
 
 
