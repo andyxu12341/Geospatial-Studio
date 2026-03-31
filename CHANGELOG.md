@@ -1,5 +1,22 @@
 
 
+# [1.2.0](https://github.com/andyxu12341/Geospatial-Studio/compare/v1.1.0...v1.2.0) (2026-03-31)
+
+
+### Bug Fixes
+
+* Revert to version 1.0.2 and remove unused dependencies ([a942de1](https://github.com/andyxu12341/Geospatial-Studio/commit/a942de1bc541f3ebcda728bb9b5c8be6e9c516ca))
+* Simplify OSM POI query and parsing ([a0af30a](https://github.com/andyxu12341/Geospatial-Studio/commit/a0af30a824118143f227b22d80dc74facabb80f6))
+* Update project version and dependencies ([9e41b30](https://github.com/andyxu12341/Geospatial-Studio/commit/9e41b30c273dd2b6b920b5102c6cc05cbab88f23))
+* 修复 GitHub Pages 部署白屏与更新页面标题 ([3a78b4e](https://github.com/andyxu12341/Geospatial-Studio/commit/3a78b4e1cbb68c7742d41c2699fbb8eebf59827c))
+* 更新页面标题为 Geospatial Studio ([e5449f6](https://github.com/andyxu12341/Geospatial-Studio/commit/e5449f6c15267cf0d1fbf69aae613fabb599e988))
+
+
+### Features
+
+* Introduce Zustand for state management ([f626cf7](https://github.com/andyxu12341/Geospatial-Studio/commit/f626cf797db00b780f1610ba89d1615cce5576a3))
+* **useOverpassQuery:** Improve semantic search fallback ([7838f1f](https://github.com/andyxu12341/Geospatial-Studio/commit/7838f1fcfef0002c677f212d90eb2c8003a3ae42))
+
 * chore: prepare for release (98e42d8)
 * feat: Introduce Zustand for state management (f626cf7)
 * chore: release v1.1.0 (59add75)
