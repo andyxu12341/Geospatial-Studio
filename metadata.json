@@ -1,0 +1,5 @@
+{
+  "name": "Geospatial Studio",
+  "description": "A powerful geospatial data processing tool supporting geocoding, coordinate transformation, and spatial query from multiple map sources.",
+  "requestFramePermissions": []
+}
